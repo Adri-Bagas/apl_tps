@@ -151,15 +151,15 @@ namespace tps_apps.service
                         if (model.status_approve == "APR")
                         {
                             sql = "";
-                            sql = $"UPDATE mst_user SET is_enabled=1,status='APR',updated_user='" + model.user_id + "',updated_date=NOW() WHERE id=" + model.id + " AND username = '" + model.username + "' AND is_enabled=0 AND status='NEW'";
+                            sql = $"UPDATE mst_user SET is_enabled=1,status='APR',updated_user='" + model.user_id + "',updated_date=NOW() WHERE id=" + model.id + " AND username = '" + model.username + "' AND status='NEW'";
 
                             var update = await SqlMapper.ExecuteAsync(conn, sql, null, null, null, CommandType.Text);
                             if (update > 0)
                             {
                                 var message2 = "";
                                 sql = "";
-                                sql = $"INSERT INTO mst_login(username,password,level,is_enabled,created_user,created_date) " +
-                                    $"SELECT username,password,1 AS level,1 AS enabled,'" + model.user_id + "' AS created_user,NOW() AS created_date " +
+                                sql = $"INSERT INTO mst_login(username,password,level,is_enabled,created_user,created_date,login_id) " +
+                                    $"SELECT username,password,1 AS level,1 AS enabled,'" + model.user_id + "' AS created_user,NOW() AS created_date ,'" + model.id + "'" +
                                     $"FROM mst_user WHERE id=" + model.id + " AND username='" + model.username + "' AND is_enabled=1 AND STATUS='APR'";
                                 var update2 = await SqlMapper.ExecuteAsync(conn, sql, null, null, null, CommandType.Text);
                                 if (update2 > 0)
@@ -181,7 +181,7 @@ namespace tps_apps.service
                         else
                         {
                             sql = "";
-                            sql = $"UPDATE mst_user SET is_enabled=0,status='DE',updated_user='" + model.user_id + "',updated_date=NOW() WHERE id=id=" + model.id + " AND username = '" + model.username + "' AND is_enabled=0 AND status='NEW'";
+                            sql = $"UPDATE mst_user SET is_enabled=0,status='DE',updated_user='" + model.user_id + "',updated_date=NOW() WHERE id=" + model.id + " AND username = '" + model.username + "' AND status='NEW'";
 
                             var update = await SqlMapper.ExecuteAsync(conn, sql, null, null, null, CommandType.Text);
                             if (update > 0)

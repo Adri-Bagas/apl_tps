@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "jfQ8EM6BHMv39SxGxD0M5qACkL23Wrp8knXsnUzwMH0=",
+  "Source": "tps_apps",
+  "BasePath": "_content/tps_apps",
+  "Mode": "Default",
+  "ManifestType": "Publish",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}

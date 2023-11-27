@@ -71,8 +71,8 @@ namespace tps_apps.Controllers
                     }
                     else
                     {
-                        sql = $"INSERT INTO mst_pendaftar_tps(no_ktp,nama,jenis_kelamin,address,hp,is_enabled,created_date,created_user) " +
-                        $" VALUES('{no_ktp}','{model.nama}','{model.jenis_kelamin}','{model.address}',{model.hp},1,NOW(),'{model.user_id}')";
+                        sql = $"INSERT INTO mst_pendaftar_tps(no_ktp,nama,jenis_kelamin,address,hp,is_enabled,created_date,created_user,tps_id) " +
+                        $" VALUES('{no_ktp}','{model.nama}','{model.jenis_kelamin}','{model.address}',{model.hp},1,NOW(),'{model.user_id}','{model.tps_id}')";
 
                         var save = await SqlMapper.ExecuteAsync(conn, sql, null, null, null, CommandType.Text);
                         if (save > 0)

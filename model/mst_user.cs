@@ -45,6 +45,7 @@
         public int is_enabled { get; set; }
         public int level { get; set; }
         public string user_id { get; set; }
+        public int tps_id { get; set; }
     }
 
     public class mst_user_approve_param

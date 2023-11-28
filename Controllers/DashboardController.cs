@@ -44,11 +44,18 @@ namespace tps_apps.Controllers
                 sql = "";
                 sql = $"SELECT COUNT(no_ktp) AS total_pendukung FROM mst_pendaftar_tps WHERE is_enabled=1";
                 var total_pendukung = await SqlMapper.ExecuteScalarAsync<int>(conn, sql, null, null, null, CommandType.Text);
+                sql = "";
+                sql = $"SELECT COUNT(no_ktp) AS mst_pendaftar_tps FROM  mst_pendaftar_tps WHERE is_enabled=1 and jenis_kelamin='P'";
+                var total_pendukung_perempuan = await SqlMapper.ExecuteScalarAsync<int>(conn, sql, null, null, null, CommandType.Text);
+                sql = "";
+                sql = $"SELECT COUNT(no_ktp) AS mst_pendaftar_tps FROM  mst_pendaftar_tps WHERE is_enabled=1 and jenis_kelamin='L'";
+                var total_pendukung_laki = await SqlMapper.ExecuteScalarAsync<int>(conn, sql, null, null, null, CommandType.Text);
                 result = new 
                 {
                     total_pendukung= total_pendukung,
                     total_finish=total_finish,
                     total_unfinish= total_pendukung - total_finish,
+                    total_pendukung_laki = total_pendukung_laki
                 };
                 
             }

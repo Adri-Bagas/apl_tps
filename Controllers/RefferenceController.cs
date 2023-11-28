@@ -188,7 +188,52 @@ namespace tps_apps.Controllers
                 {
                     conn.Open();
                 }
-                sql = $"SELECT a.no_ktp,a.nama,a.jenis_kelamin,a.address,a.hp FROM  mst_pendaftar_tps a \r\nLEFT JOIN trx_vote b ON a.no_ktp=b.no_ktp\r\nWHERE a.is_enabled=1 AND b.is_enabled=1 AND b.no_ktp IS null\r\nORDER BY a.nama asc";
+                sql = $"SELECT a.no_ktp,a.nama,a.jenis_kelamin,a.address,a.hp FROM  mst_pendaftar_tps a \r\nWHERE a.is_enabled=1 AND a.no_ktp NOT IN(SELECT b.no_ktp FROM trx_vote b WHERE b.is_enabled=1)\r\nORDER BY a.nama ASC";
+
+
+                result = await SqlMapper.QueryAsync<object>(conn, sql, null, null, null, CommandType.Text);
+                if (result != null)
+                {
+                    status_code = 200;
+                    message = "Success";
+                }
+                else
+                {
+                    message = "Data not found";
+                }
+            }
+            catch (Exception ex)
+            {
+
+                message = ex.Message;
+            }
+            finally
+            {
+                if (conn.State == ConnectionState.Open)
+                {
+                    conn.Close();
+                }
+                conn.Dispose();
+            }
+            return Ok(new { status_code, message, data = result });
+        }
+
+        [HttpPost]
+        [Route("get-list-user-vote-gender")]
+        public async Task<IActionResult> GetListUserVoteGender(string jk)
+        {
+            var message = "";
+            var status_code = 100;
+            var result = new object();
+            var conn = new MySqlConnection(getConnection());
+            try
+            {
+                var sql = "";
+                if (conn.State == ConnectionState.Closed)
+                {
+                    conn.Open();
+                }
+                sql = $"SELECT a.no_ktp,b.nama,b.jenis_kelamin,b.address,b.hp FROM  trx_vote a \r\nINNER JOIN mst_pendaftar_tps b ON a.no_ktp=b.no_ktp\r\nWHERE a.is_enabled=1 AND b.jenis_kelamin='" + jk + "'ORDER BY b.nama asc";
 
 
                 result = await SqlMapper.QueryAsync<object>(conn, sql, null, null, null, CommandType.Text);
@@ -247,6 +292,50 @@ namespace tps_apps.Controllers
                     {
                         message = "Data not found";
                     }
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+                message = ex.Message;
+            }
+            finally
+            {
+                if (conn.State == ConnectionState.Open)
+                {
+                    conn.Close();
+                }
+                conn.Dispose();
+            }
+            return Ok(new { status_code, message, data = result });
+        }
+
+        [HttpPost]
+        [Route("get-list-kelurahan")]
+        public async Task<IActionResult> GetListKelurahan()
+        {
+            var message = "";
+            var status_code = 100;
+            var result = new object();
+            var conn = new MySqlConnection(getConnection());
+            try
+            {
+                if (conn.State == ConnectionState.Closed)
+                {
+                    conn.Open();
+                }
+                var sql = "SELECT id,nama FROM mst_kelurahan WHERE is_enabled=1";
+
+                result = await SqlMapper.QueryAsync<object>(conn, sql, null, null, null, CommandType.Text);
+                if (result != null)
+                {
+                    status_code = 200;
+                    message = "Success";
+                }
+                else
+                {
+                    message = "Data not found";
                 }
 
             }

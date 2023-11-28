@@ -1,4 +1,4 @@
-﻿using Dapper;
+using Dapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MySqlConnector;
@@ -6,7 +6,7 @@ using System.Data;
 using System.Security.Claims;
 using tps_apps.model;
 
-namespace tps_apps.service
+namespace tps_apps.Controllers
 {
     [Route("api/v1/[controller]")]
     [ApiController]
@@ -16,8 +16,8 @@ namespace tps_apps.service
         private readonly IWebHostEnvironment _env;
         public RegisterController(IConfiguration config, IWebHostEnvironment env)
         {
-            this._config = config;
-            this._env = env;
+            _config = config;
+            _env = env;
         }
 
         private string getConnection()
@@ -60,9 +60,13 @@ namespace tps_apps.service
                 {
                     message = "Password max 5 character";
                 }
-                else if (model.tps_id <= 0)
+                else if (model.id_kelurahan <= 0)
                 {
-                    message = "TPS id tidak boleh kosong";
+                    message = "Kelurahan id tidak boleh kosong";
+                }
+                else if (string.IsNullOrEmpty(model.nama_tps))
+                {
+                    message = "Nama TPS tidak boleh kosong";
                 }
                 else if (string.IsNullOrEmpty(model.jenis_kelamin))
                 {
@@ -75,7 +79,7 @@ namespace tps_apps.service
                         conn.Open();
                     }
                     var sql = $"SELECT count(id) as total FROM mst_user WHERE username='" + model.username + "'";
-                    var count = await SqlMapper.ExecuteScalarAsync<int>(conn, sql, null, null, null, CommandType.Text);
+                    var count = await conn.ExecuteScalarAsync<int>(sql, null, null, null, CommandType.Text);
                     if (count > 0)
                     {
                         message = "Username sudah ada, silahkan gunakan yang lain";
@@ -83,10 +87,10 @@ namespace tps_apps.service
                     else
                     {
                         sql = "";
-                        sql = $"INSERT INTO mst_user(instansi_id,nama,jenis_kelamin,no_hp,tps_id,lon,lat,username,PASSWORD,is_enabled,status,created_date,created_user) " +
-                            $" VALUES('{model.instansi_id}','{model.nama}','{model.jenis_kelamin}','{model.no_hp}',{model.tps_id},'{model.lon}','{model.lat}','{model.username}','{model.password}',0,'NEW',NOW(),'{model.user_id}')";
+                        sql = $"INSERT INTO mst_user(instansi_id,nama,jenis_kelamin,no_hp,lon,lat,id_kelurahan,nama_tps,username,password,is_enabled,status,created_date,created_user) " +
+                            $" VALUES('{model.instansi_id}','{model.nama}','{model.jenis_kelamin}','{model.no_hp}','{model.lon}','{model.lat}',{model.id_kelurahan},'{model.nama_tps}','{model.username}','{model.password}',0,'NEW',NOW(),'{model.user_id}')";
 
-                        var save = await SqlMapper.ExecuteAsync(conn, sql, null, null, null, CommandType.Text);
+                        var save = await conn.ExecuteAsync(sql, null, null, null, CommandType.Text);
                         if (save > 0)
                         {
                             status_code = 200;
@@ -141,7 +145,7 @@ namespace tps_apps.service
                         conn.Open();
                     }
                     var sql = $"SELECT count(id) as total FROM mst_user WHERE id=" + model.id + " AND username='" + model.username + "' AND is_enabled=0 AND status='NEW'";
-                    var count = await SqlMapper.ExecuteScalarAsync<int>(conn, sql, null, null, null, CommandType.Text);
+                    var count = await conn.ExecuteScalarAsync<int>(sql, null, null, null, CommandType.Text);
                     if (count <= 0)
                     {
                         message = "Username tidak ditemukan";
@@ -153,7 +157,7 @@ namespace tps_apps.service
                             sql = "";
                             sql = $"UPDATE mst_user SET is_enabled=1,status='APR',updated_user='" + model.user_id + "',updated_date=NOW() WHERE id=" + model.id + " AND username = '" + model.username + "' AND status='NEW'";
 
-                            var update = await SqlMapper.ExecuteAsync(conn, sql, null, null, null, CommandType.Text);
+                            var update = await conn.ExecuteAsync(sql, null, null, null, CommandType.Text);
                             if (update > 0)
                             {
                                 var message2 = "";
@@ -161,7 +165,7 @@ namespace tps_apps.service
                                 sql = $"INSERT INTO mst_login(username,password,level,is_enabled,created_user,created_date,login_id) " +
                                     $"SELECT username,password,1 AS level,1 AS enabled,'" + model.user_id + "' AS created_user,NOW() AS created_date ,'" + model.id + "'" +
                                     $"FROM mst_user WHERE id=" + model.id + " AND username='" + model.username + "' AND is_enabled=1 AND STATUS='APR'";
-                                var update2 = await SqlMapper.ExecuteAsync(conn, sql, null, null, null, CommandType.Text);
+                                var update2 = await conn.ExecuteAsync(sql, null, null, null, CommandType.Text);
                                 if (update2 > 0)
                                 {
                                     message2 = "Create login success";
@@ -183,7 +187,7 @@ namespace tps_apps.service
                             sql = "";
                             sql = $"UPDATE mst_user SET is_enabled=0,status='DE',updated_user='" + model.user_id + "',updated_date=NOW() WHERE id=" + model.id + " AND username = '" + model.username + "' AND status='NEW'";
 
-                            var update = await SqlMapper.ExecuteAsync(conn, sql, null, null, null, CommandType.Text);
+                            var update = await conn.ExecuteAsync(sql, null, null, null, CommandType.Text);
                             if (update > 0)
                             {
                                 message = "Reject user success";

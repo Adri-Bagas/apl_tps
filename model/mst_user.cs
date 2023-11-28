@@ -1,4 +1,4 @@
-﻿namespace tps_apps.model
+namespace tps_apps.model
 {
     public class mst_user
     {
@@ -45,7 +45,6 @@
         public int is_enabled { get; set; }
         public int level { get; set; }
         public string user_id { get; set; }
-        public string nama_tps { get; set; }
         public int id_kelurahan { get; set; }
     }
 

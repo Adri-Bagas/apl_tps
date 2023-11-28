@@ -99,19 +99,22 @@ namespace tps_apps.Controllers
                         conn.Open();
                     }
                     var _no_ktp = Regex.Replace(no_ktp, @"[^A-Za-z0-9 /]+|( )+", "$1").Trim().ToUpper();
-                    sql = $"SELECT count(no_ktp) as total FROM mst_vote WHERE no_ktp='{no_ktp}' AND is_enabled=1";
+                    sql = $"SELECT count(no_ktp) as total FROM trx_vote WHERE no_ktp='{no_ktp}' AND is_enabled=1";
                     var count = await SqlMapper.ExecuteScalarAsync<int>(conn, sql, null, null, null, CommandType.Text);
                     if (count > 0)
                     {
-                        status_code = 200;
+                        status_code = 100;
                         message = $"Input vote by NIK/KTP {no_ktp} sudah ada";
                     }
                     else
                     {
                         sql = "";
-                        sql = "INSERT INTO mst_vote(no_ktp,lon,lat,address,is_enabled,created_date,created_user) " +
+                        sql = "INSERT INTO trx_vote(no_ktp,lon,lat,address,is_enabled,created_date,created_user) " +
                             "VALUES('" + _no_ktp + "','" + lon + "','" + lat + "','" + address + "',1,'" + user_id + "',NOW())";
-                        var save = await SqlMapper.ExecuteAsync(conn, "", null, null, null, CommandType.Text);
+                        var save = await SqlMapper.ExecuteAsync(conn, sql, null, null, null, CommandType.Text);
+
+                        status_code = 200;
+                        message = $"Input vote by NIK/KTP {no_ktp} Berhasil!";
                     }
                 }
 
